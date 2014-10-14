@@ -1,0 +1,20 @@
+!!!
+%html
+  %head
+    %meta{:name => "viewport", :content => "width=device-width, initial-scale=1, maximum-scale=1"}
+    %title= content_for?(:title) ? yield(:title) : "Skill2Share"
+    %link{href: 'http://fonts.googleapis.com/css?family=Quicksand:400,700', type: 'text/css', rel: 'stylesheet' }
+    = stylesheet_link_tag "application-desktop", :media => "all"
+    = javascript_include_tag "application-desktop"
+    = csrf_meta_tags
+    = yield(:head)
+  %body
+    #header
+      = content_for?(:header) ? yield(:header) :  render('layouts/header')
+    #page
+      #container
+        - flash.each do |type, msg|
+          %div{:class => "alert alert-#{type == :notice ? "success" : type} fadeout", "data-dismiss" => "alert"}
+            %button.close &times;
+            = msg if msg.is_a?(String)
+        = yield

@@ -1,0 +1,42 @@
+- content_for :header_title do
+  Profile
+
+.list-item
+  .list-item-header
+    = gravatar_for @user
+    .description
+      -if (@user.name == 'testAccount')
+        %h3= "Bill"
+      -else 
+        %h3= @user.name
+      - if @current_user.id == @user.id
+        %p= @user.email
+%h1.seperator= t('profile_page.recent_title')
+- @marketposts.each do |marketpost|
+  .list-item
+    -if (@current_user.admin == true or marketpost.user_id == @current_user.id) 
+      %a= link_to t('common_language.delete'), marketposts_hide_path(:id => marketpost.id), :method=>'put', :class => "delete-post"
+    .list-item-header.inset
+      %h3= marketpost.title
+    .list-item-body
+      .inset
+        %p.post-message= marketpost.message
+        %small
+          = time_ago_in_words marketpost.created_at
+          = t('datetime.distance_in_words.ago')
+        - if (marketpost.user.id != @current_user.id )
+          = link_to "#", :class=>"button-full marketpost-message", :"data-toggle" => 'modal', :"data-target" =>  "#myModal", :"data-id" => marketpost.id do
+            %i.icon-envelope-alt
+            =  t('main_page.main.message') + " " + marketpost.user.name.split(' ').first
+
+%div#myModal.modal.bs-example-modal-sm.fade
+  %div.modal-dialog.modal-sm
+    %div.modal-content
+      %div.modal-header
+        %h4.modal-title= t('message_page.message_send')
+      %div.modal-body
+        = form_for Transaction.new do |f|
+          .field
+          = f.text_area :description, :rows => 6, :cols => 100, :placeholder => t('message_page.message_type')
+          = f.hidden_field :marketpost_id
+          =submit_tag t('message_page.send'), :class=>"btn btn-success btn-send message-button"

@@ -1,0 +1,13 @@
+- content_for :header_title do
+  =  t('message_page.messages_all')
+- @transactions.each do |transaction|
+  .list-item-message{ class: ( transaction.sender_read == true && transaction.sender_id == @current_user.id || transaction.receiver_read == true && transaction.receiver_id == @current_user.id ) ? "read" : nil } 
+    = link_to t('common_language.delete'), transactions_hide_path(:id => transaction.id), :method => 'put', :class => "delete-post destroy"
+    .list-item-header-message  
+      = link_to transaction do
+        - if transaction.receiver_id == @current_user.id
+          %h3= Marketpost.find_by_id(transaction.marketpost_id).title
+          %p= t('message_page.message_from') + " " + User.find_by_id(transaction.sender_id).name
+        - else
+          %h3= Marketpost.find_by_id(transaction.marketpost_id).title
+          %p= t('message_page.message_to') + " " + User.find_by_id(transaction.receiver_id).name

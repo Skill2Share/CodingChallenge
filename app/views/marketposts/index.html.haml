@@ -1,0 +1,79 @@
+- content_for :header_title do  
+  = link_to t('main_page.header.offers'), "#", :class => "offerShow"
+  %small= t('main_page.header.or')
+  = link_to t('main_page.header.requests'), "#", :class => "requestShow"
+  - if (@transaction_array.length >= 1)
+    = link_to transactions_path, :class => "header-message" do
+      %i.icon-envelope-alt
+      %span.header-message-text=@transaction_array.length
+
+- @marketposts.each do |marketpost|
+  .list-item{:class => marketpost.post_type, :data=> marketpost.tag_list.map { |t| t}.join(' ')}
+    -if (@marketpost.user.admin == true)
+      %a= link_to t('common_language.delete'), marketposts_hide_path(:id => marketpost.id), :method=>'put', :class => "delete-post"
+    .list-item-header
+      = link_to marketpost.user do
+        = gravatar_for marketpost.user
+      .description
+        %h3= marketpost.title
+        %p.list-item-p= "-" + marketpost.user.name.split(' ').first
+         
+        
+    .list-item-body
+      .inset
+      
+        %p.post-message= marketpost.message
+        %div.list-item-tags= raw marketpost.tag_list.map { |t| link_to t,"#",:"data-filter" => [t], :class => "tags"  }.join(', ')
+        - if (marketpost.user.id != @marketpost.user.id && @marketpost.user.admin != true)
+          = link_to "#", :class=>"button-full marketpost-message", :"data-toggle" => 'modal', :"data-target" =>  "#myModal", :"data-id" => marketpost.id do
+            %i.icon-envelope-alt
+            =  t('main_page.main.message') + " " + marketpost.user.name.split(' ').first
+
+    
+
+-if (@marketpost.user.admin != true)
+  %div#plusle
+    %a{ :id => "openclick", :href => "#", :"data-toggle" => 'modal', :"data-target" =>  "#addModal" }
+      = image_tag("plus2.png")    
+  %div#addModal.modal.bs-example-modal-sm.fade
+    %div.modal-dialog.modal-sm
+      %div.modal-content
+        %div.modal-header
+          %h4.modal-title= t('main_page.main.add_title')
+        %div.modal-body
+          %div#incoc
+            = form_for @marketpost do |f|
+              %p
+                = f.label :title, t('main_page.main.title')
+                
+                = f.text_field :title
+              %p
+                = f.label :message, t('main_page.main.message')
+                
+                = f.text_field  :message
+              %p
+                = f.label :post_type, t('main_page.main.post_type')
+                
+                = f.select :post_type, [[t('main_page.main.offer'), "offer"], [t('main_page.main.request'), "request"]]
+              %p 
+                = f.label :tag_list, t('main_page.main.tags')
+                
+                = f.text_field :tag_list;
+              = f.submit t('main_page.main.create'), :class => 'btn btn-success btn-send'
+-else 
+  %div#plusle 
+    %h4= t('common_language.admin')
+
+%div#myModal.modal.bs-example-modal-sm.fade
+  %div.modal-dialog.modal-sm
+    %div.modal-content
+      %div.modal-header
+        %h4.modal-title= t('message_page.message_send')
+      %div.modal-body
+        = form_for Transaction.new do |f|
+          .field
+          = f.text_area :description, :rows => 6, :cols => 100, :placeholder => t('message_page.message_type')
+          = f.hidden_field :marketpost_id
+          =submit_tag t('message_page.send'), :class=>"btn btn-success btn-send message-button"
+    
+    

@@ -1,0 +1,43 @@
+- content_for :header_title do
+	Messages
+.subheader
+	.subheader-title
+		%h3=@marketpost.title
+	.subheader-description
+		%p=@marketpost.message
+
+.message-box
+	- @all_messages_from_marketpost.each do |message|
+		-if message.receiver_id == @current_user.id
+			.message-row
+				.message-box-left
+					.message.description= message.description
+					%small
+						= @current_user.name.split(' ').first
+						= time_ago_in_words message.created_at
+						= t('datetime.distance_in_words.ago')
+		-else
+			.message-row
+				.message-box-right
+					.message-description=message.description
+					.message-from
+					%small.message-time
+						= #User.find_by_id(split(' ').first
+						= time_ago_in_words message.created_at
+						= t('datetime.distance_in_words.ago')
+
+%h1.seperator Send Message
+= form_for @transaction do |f|
+	- if @transaction.errors.any?
+		#error_explanation
+			%h4= "#{pluralize(@transaction.errors.count, "error")} prohibited this transaction from being saved:"
+			%ul
+				- @transaction.errors.full_messages.each do |msg|
+					%li= msg
+	.field
+		= f.text :user_id
+	.field
+		= f.text_area :description, rows: 10
+		= f.hidden_field :marketpost_id, value: @current_transaction.id
+	.actions
+		= f.submit 'Send', :class=>"btn btn-success btn-send"

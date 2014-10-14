@@ -1,0 +1,19 @@
+- content_for :header_title do
+  New Message
+%h3= @marketpost.title
+%p.list-item-p= @marketpost.message
+
+%h1.seperator= "Send Message to" + @marketpost.user.name.split(' ').first
+= form_for @transaction do |f|
+  - if @transaction.errors.any?
+    #error_explanation
+      %h4= "#{pluralize(@transaction.errors.count, "error")} prohibited this transaction from being saved:"
+      %ul
+        - @transaction.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.text_area :description, rows: 10
+    = f.hidden_field :marketpost_id, value: @marketpost.id
+  .actions
+    = f.submit 'Send', :class=>"btn btn-success btn-send"

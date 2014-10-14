@@ -1,0 +1,59 @@
+- content_for :header_title do
+	= t('message_page.messages')
+.list-item-message
+	.list-item-header-message 
+		= gravatar_for @marketpost.user
+		.description
+			%h3= @marketpost.title
+			%p.list-item-p= "-" + @marketpost.user.name.split(' ').first
+	.list-item-body{:style => 'display:block'}
+		.inset
+			%p.post-message= @marketpost.message
+			%div.list-item-tags= raw @marketpost.tag_list.map { |t| link_to t,"#",:"data-filter" => [t], :class => "tags"  }.join(', ')
+
+.message-box
+	- @all_messages_from_marketpost.each do |message|
+		-if message.receiver_id == message.user_id
+			.message-row
+				.message-box-left
+					.message.description= message.description
+					%small
+						= @receiver.name
+						= time_ago_in_words message.created_at
+						= t('datetime.distance_in_words.ago')
+		-else
+			.message-row
+				.message-box-right
+					.message-description=message.description
+					.message-from
+					%small.message-time
+						= @sender.name
+						= time_ago_in_words message.created_at
+						= t('datetime.distance_in_words.ago')
+
+%div#plusle-message
+	%a{ :id => "openclick", :href => "#", :"data-toggle" => 'modal', :"data-target" =>  "#addModal" }
+		= image_tag("plus2.png")
+%div#addModal.modal.bs-example-modal-sm.fade
+	%div.modal-dialog.modal-sm
+		%div.modal-content
+			%div.modal-header
+				%h4.modal-title= t('message_page.message_send')
+			%div.modal-body
+				%div#incoc
+					= form_for @transaction do |f|
+						- if @transaction.errors.any?
+							#error_explanation
+								%h4= "#{pluralize(@transaction.errors.count, "error")} prohibited this transaction from being saved:"
+								%ul
+								- @transaction.errors.full_messages.each do |msg|
+									%li= msg
+
+						.field
+							= f.text_area :description, rows: 5, placeholder: t('message_page.message_type')
+							= f.hidden_field :marketpost_id, value: @marketpost.id
+							= f.hidden_field :receiver_id, value: @current_receiver_id
+							= f.hidden_field :sender_id, value: @current_sender_id
+						.actions
+							= f.submit t('message_page.send'), :class=>"btn btn-success btn-send"
+	

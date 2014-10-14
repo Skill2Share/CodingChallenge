@@ -1,0 +1,33 @@
+#header
+  #menu
+    %ul.nav
+      %li
+        %a{ :id => "simple-menu", :href => "#sidr"}
+          = image_tag("optionsnew.png")
+  #title
+    = content_for?(:header_title) ? yield(:header_title) : "Skill2Share"
+
+%div#sidr 
+  %ul
+    %p.menuItemFirst Skill 2 Share
+    %li 
+      %a{ :id => "standardbtn", :href => marketposts_all_path}= t('main_page.menu.offers_requests')
+    -if (@current_user.admin != true)
+      %li 
+        %a{ :id => "standardbtn", :href => user_path(@current_user.id)}= t('main_page.menu.my_posts')
+      %li 
+        %a{ :id => "standardbtn", :href => transactions_path }= t('main_page.menu.my_messages')
+    %li
+      %a{ :id => "standardbtn", :href => '/logout'}= t('main_page.menu.logout')
+
+    %p.menuItem= t('main_page.menu.language')
+    %li
+      -if (I18n.locale == :en)
+        %a{ :id => "standardbtn"}= link_to "日本語", :locale=>'ja'
+      -if (I18n.locale == :ja)
+        %a{ :id => "standardbtn"}= link_to "English", :locale=>'en' 
+    %p.menuItem= t('main_page.menu.popular_tags')
+    %div
+      - count_to_menu Marketpost.where(:hidden_marketpost => false).tag_counts.map do |tag|
+        %li= link_to tag.name, "#", :"data-filter" => tag, :class => "tags"
+        
